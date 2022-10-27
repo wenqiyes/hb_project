@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }} - Details{% endblock %}
+
+{% block body %}
+<h1>{{ movie.title }}</h1>
+
+<p>
+  {{ movie.overview }}
+</p>
+
+<img src="{{ movie.poster_path }}">
+
+<h2>Average Ratings</h2>
+
+
+<h3>Rate this Movie</h3>
+  <form action="/rating" method="POST">
+    <p>
+      Scale from 1- 5 <input type="number" name="rating">
+    </p>
+    <p>
+      <input type="submit">
+    </p>
+  </form>
+
+
+
+{% endblock %}
