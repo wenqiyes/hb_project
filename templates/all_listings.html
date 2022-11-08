@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}All Listings{% endblock %}
+
+{% block body %}
+    <div class="container">
+        
+        <div id="listing-search-results">
+            <h2>Listing Search Results</h2>
+    
+            <p>
+              <span id="result-count">
+                {{ data_count }}
+              </span>
+              listings matched your search.
+            </p>
+            <ul class="db_listing-list list-group">
+              {% for listing in db_results %}
+                <li class="list-group-item list-group-item-action">
+                  
+                  <div class="row">
+                    <div class="col">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5>Apartment Name: <a href="" target="_blank">{{ listing.name }}</a></h5>
+                        <h5>Phone: {{listing.phone}}</h5>
+    
+                        <h5>Address: {{ listing.address}} {{listing.zip_code}}</h5>
+                        <h5>Rating: {{ listing.rating}}</h5>
+                      </div>
+                    </div>
+                  </div>
+                
+                  <div class="row">
+                    <div class="col-6">
+                      <img id="listing-img" src="{{ listing.image_url}}">
+                    </div>
+                  </div>
+
+                </li>
+              {% endfor %}
+            </ul>
+    
+            <ul class="listings-list list-group">
+              {% for listing in listing_results %}
+                <li class="list-group-item list-group-item-action">
+                  
+                  <div class="row">
+                    <div class="col">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5>Apartment Name: <a href="" target="_blank">{{ listing['name'] }}</a></h5>
+                        <h5>Phone: {{listing['phone'][2:]}}</h5>
+    
+                        <h5>Address: {{ listing['location']['display_address']|join(',')}}</h5>
+                        <h5>Rating: {{ listing['rating']}}</h5>
+                        <button id="favor_button">Add to my list</button>
+                      </div>
+                    </div>
+                  </div>
+                
+                  <div class="row">
+                    <div class="col-6">
+                      <img id="listing-img" src="{{ listing['image_url'] }}">
+                    </div>
+                  </div>
+
+                </li>
+              {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+
+    
+{% endblock %}

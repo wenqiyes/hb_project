@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Post Your Listing{% endblock %}
+
+{% block body %}
+    <form action="/user_listings" method="POST">
+        <p>
+            <label for="add_name">Apartment Name:</label>
+            <input id="add_name" type="text" name="add_name">
+        </p>
+        <p>
+            <label for="add_phone">Phone:</label>
+            <input id="add_phone" type="text" name="add_phone">
+        </p>
+        <p>
+            <label for="add_address">Address:</label>
+            <input id="add_address" type="text" name="add_address">
+        </p>
+        <p>
+            <label for="add_city">City:</label>
+            <input id="add_city" type="text" name="add_city">
+        </p>
+        <p>
+            <label for="add_state">State:</label>
+            <input id="add_state" type="text" name="add_state">
+        </p>
+        <p>
+            <label for="add_zip_code">Zip Code:</label>
+            <input id="add_zip_code" type="text" name="add_zip_code">
+        </p>
+        <p>
+            <label for="add_image_url">Image URL:</label>
+            <input id="add_image_url" type="text" name="add_image_url">
+        </p>
+        <p>
+            <label for="add_rating">Rating:</label>
+            <input id="add_rating" type="number" step="0.1" name="add_rating">
+        </p>
+        <p>
+            <label for="add_user_email">Submitter UserID:</label>
+            <input id="add_user_id" type="text" name="add_user_id">
+        </p>
+        <button id="add_listing_button">Post Listing</button>
+    </form>
+{% endblock %}

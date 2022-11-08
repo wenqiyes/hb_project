@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Apartment Finder Home{% endblock %}
+
+{% block body %}
+    <h1>Welcome to Apartment Finder!</h1>
+   <form action="/listings" method="'GET">
+    <label for="zipcode">Please enter your zip code:</label>
+    <input type="text" name="zipcode" id="zipcode">
+    <button type="submit">Submit</button>
+   </form>
+   <a href="{{ url_for('login') }}">Login Page</a><br>
+    <a href="{{ url_for('register') }}">Register Page</a><br>
+
+{% endblock %}

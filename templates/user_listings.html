@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}User Listings{% endblock %}
+
+{% block body %} 
+    <h1>You are logged in.</h1>
+    <h1>User Listings</h1>
+
+    <ul class="user_listings-list list-group">
+        {% for user_listing in user_listings %}
+          <li class="list-group-item list-group-item-action">
+            
+            <div class="row">
+              <div class="col">
+                <div class="d-flex w-100 justify-content-between">
+                  <h5>Apartment Name: <a href="" target="_blank">{{ user_listing.name }}</a></h5>
+                  <h5>Phone: {{ user_listing.phone }}</h5>
+
+                  <h5>Address: {{ user_listing.address}}  {{user_listing.zip_code}}</h5>
+                  <h5>Rating: {{ user_listing.rating }}</h5>
+                 
+                </div>
+              </div>
+            </div>
+          
+            <div class="row">
+              <div class="col-6">
+                <img src="{{ user_listing.image_url }}">
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+{% endblock %}
