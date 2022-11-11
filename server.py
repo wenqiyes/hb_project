@@ -28,7 +28,6 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    print(user_id)
     return crud.get_user_by_id(int(user_id))
 
 class RegisterForm(FlaskForm):
@@ -67,13 +66,13 @@ def homepage():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by( email=form.email.data).first()
         if user:
-            print(user.password)
-            print(form.password.data)
             if werkzeug.security.check_password_hash(user.password, form.password.data):
                 login_user(user)
+                session["user_email"] = user.email
                 return redirect('/user_listings')
+        flash("The email or password you entered was incorrect, please try again!")
     return render_template('login.html', form=form)
 
 
@@ -81,13 +80,14 @@ def login():
 
 
 @app.route('/logout', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    session.pop('user_email')
+    return redirect("/")
 
 
-@ app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
 
@@ -136,57 +136,110 @@ def all_listings():
     
     #data count from yelp_api and database
     data_count = 50 + len(db_results)
-    
 
-    return render_template('all_listings.html', pformat=pformat,listings_data=listings_data,listing_results=listing_results,db_results=db_results,data_count=data_count)
+    if 'user_email' in session:
+        user_id = crud.get_user_by_email(session['user_email']).id
+    else:
+        user_id = None
+    print(user_id)
+
+    return render_template('all_listings.html', pformat=pformat,listings_data=listings_data,listing_results=listing_results,db_results=db_results,data_count=data_count, user_id=user_id)
 
 @app.route("/add_listing")
-# @login_required
+@login_required
 def add_listing():
-    return render_template('add_listing.html')
+    user_email = session.get("user_email","")
+    user_id = crud.get_user_by_email(user_email).id
+    return render_template('add_listing.html',user_id=user_id)
 
+@app.route("/add_to_my_list", methods=['POST'])
+@login_required
+def add_to_my_list():
+    """Add listing from home page to user listing page"""
+    name = request.form.get("add_name")
+    phone = request.form.get("add_phone")
+    street_address = request.form.get("add_address")
+    city = request.form.get("add_city")
+    state = request.form.get("add_state")
+    rating = request.form.get("add_rating")
+    zip_code = int(request.form.get("add_zip_code"))
+    image_url = request.form.get("add_image_url")
+    yelp_id = request.form.get("add_yelp_id")
+    submitter = request.form.get("submitter")
+    
 
-@app.route("/user_listings")
-# @login_required
-def get_user_listings():
-    """Show all user listings"""
-    if request.method == 'GET':
-        user_listings = crud.get_all_listings()
-        return render_template('user_listings.html', user_listings = user_listings)
+    #combining information for address to match the data format of yelp_api
+    address = f"{street_address},{city},{state}"
+    # find user through its email
+    user_email = session.get("user_email","")
+    user_id = crud.get_user_by_email(user_email).id
 
-@app.route("/user_listings", methods=['POST'])
-# @login_required
-def add_user_listings():
-    """create a new user listing"""
-    if request.method =='POST':
-        name = request.form.get("add_name")
-        phone = request.form.get("add_phone")
-        street_address = request.form.get("add_address")
-        city = request.form.get("add_city")
-        state = request.form.get("add_state")
-        rating = request.form.get("add_rating")
-        zip_code = int(request.form.get("add_zip_code"))
-        image_url = request.form.get("add_image_url")
-        user_id = request.form.get("add_user_id")
-
-        #combining information for address to match the data format of yelp_api
-        address = f"{street_address},{city},{state}"
-
-        new_listing = crud.create_listing(name,rating,address,zip_code,phone,image_url,user_id,yelp_id='')
+    if submitter != str(user_id):
+        new_listing = crud.create_listing(name,rating,address,zip_code,phone,image_url,user_id,yelp_id)
         db.session.add(new_listing)
         db.session.commit()
-        flash("New Listing created!")
-        user_listings = crud.get_all_listings()
+        flash("New Listing Added!")
+        db.session.close()
+    
+        user_listings = crud.get_listing_by_user_email(user_email)
+        listing_count = len(user_listings)
 
-        # if 'user_email' in session:
-        #     submitter = session['user_email']
-        #     new_listing = crud.create_listing(name,rating,address,zip_code,phone,image_url,submitter)
-        # else:
-        #     flash("Please log in or register an account!")
-        #     redirect("/")
+        return render_template('user_listings.html',user_listings=user_listings,listing_count=listing_count)
+    else:
+        return redirect("/")
 
-        return render_template('user_listings.html',user_listings=user_listings)
 
+@app.route("/post_listing",  methods=['POST'])
+@login_required
+def post_new_listing():
+    """add new listing to user listing page"""
+    name = request.form.get("add_name")
+    phone = request.form.get("add_phone")
+    street_address = request.form.get("add_address")
+    city = request.form.get("add_city")
+    state = request.form.get("add_state")
+    rating = request.form.get("add_rating")
+    zip_code = int(request.form.get("add_zip_code"))
+    image_url = request.form.get("add_image_url")
+    yelp_id = request.form.get("add_yelp_id")
+    
+
+    #combining information for address to match the data format of yelp_api
+    address = f"{street_address},{city},{state}"
+    # find user through its email
+    user_email = session.get("user_email","")
+    user_id = crud.get_user_by_email(user_email).id
+
+    new_listing = crud.create_listing(name,rating,address,zip_code,phone,image_url,user_id,yelp_id)
+    db.session.add(new_listing)
+    db.session.commit()
+    flash("New Listing Added!")
+    db.session.close()
+    
+    user_listings = crud.get_listing_by_user_email(user_email)
+    listing_count = len(user_listings)
+
+    return render_template('user_listings.html',user_listings=user_listings,listing_count=listing_count)
+
+   
+        
+
+@app.route("/user_listings") 
+def show_user_listing() :
+    """show all user listings"""
+    user_email = session.get("user_email","")
+    try:
+        user_listings = crud.get_listing_by_user_email(user_email)
+    except:
+        flash("There is no listing yet.")
+        user_listings = []
+        # return render_template('user_listings.html',user_listings=user_listings)
+    else:
+        user_listings = crud.get_listing_by_user_email(user_email)
+        listing_count = len(user_listings)
+        # return render_template('user_listings.html',user_listings=user_listings)
+    finally:
+        return render_template('user_listings.html',user_listings=user_listings,listing_count=listing_count)
 
 
 

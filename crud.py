@@ -42,7 +42,13 @@ def get_listing_by_id(listing_id):
     """Get listing details according to its id"""
 
     return Listing.query.get(listing_id)
+
+def get_listing_by_user_email(user_email):
+    """Get Listings according to the user email"""
+    user = User.query.filter(User.email == user_email).first()
+    return user.listing
     
+
 def get_listing_from_db(zip_code):
     """Get listings that is posted by the user"""
     return Listing.query.filter(Listing.zip_code == zip_code, Listing.yelp_id =='').all()
@@ -59,4 +65,4 @@ def create_favorite(user, listing):
 
 if __name__ == '__main__':
     from server import app
-    connect_to_db(app)
+    connect_to_db(app, "favorites")

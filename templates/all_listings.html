@@ -25,13 +25,41 @@
     
                         <h5>Address: {{ listing.address}} {{listing.zip_code}}</h5>
                         <h5>Rating: {{ listing.rating}}</h5>
+                        <!-- <button id="{{ listing.listing_id }}">Add to my list</button> -->
+                        {% set address_list = listing.address.split(',') %}
+                        <form class="db_listing_form" action="/add_to_my_list" method="POST">
+                      
+                          <input id="add_name" type="hidden" value="{{ listing.name }}" name="add_name">
+                     
+                          <input id="add_phone" type="hidden" value="{{ listing.phone[2:] }}"  name="add_phone">
+
+                          <input id="add_address" type="hidden" value="{{ address_list[0] }}" name="add_address">
+                     
+                          <input id="add_city" type="hidden" value="{{ address_list[1] }}" name="add_city">
+                      
+                          <input id="add_state" type="hidden" value="{{ address_list[2] }}"  name="add_state">
+                      
+                          <input id="add_zip_code" type="hidden" value="{{ listing.zip_code }}" name="add_zip_code">
+                    
+                          <input id="add_image_url" type="hidden" value="{{ listing.image_url }}" name="add_image_url">
+                      
+                          <input id="add_rating" type="hidden" value="{{ listing.rating }}" step="0.1" name="add_rating">
+
+                          <input id="submitter" type="hidden" value="{{ listing.user.id }}" name="submitter">
+
+                          <input id="add_yelp_id" type="hidden" value="" name="add_yelp_id">
+              
+
+                          <button class="db_listing_button" type="submit" id="{{ listing.listing_id }}">Add to my List</button>
+                      
+                  </form>
                       </div>
                     </div>
                   </div>
                 
                   <div class="row">
                     <div class="col-6">
-                      <img id="listing-img" src="{{ listing.image_url}}">
+                      <img class="listing-img" id="{{ listing.listing_id }}" src="{{ listing.image_url}}">
                     </div>
                   </div>
 
@@ -46,19 +74,45 @@
                   <div class="row">
                     <div class="col">
                       <div class="d-flex w-100 justify-content-between">
-                        <h5>Apartment Name: <a href="" target="_blank">{{ listing['name'] }}</a></h5>
-                        <h5>Phone: {{listing['phone'][2:]}}</h5>
+                        <h5 class="name_{{ listing['id'] }}">Apartment Name: <a href="" target="_blank">{{ listing['name'] }}</a></h5>
+                        <h5 class="phone_{{ listing['id'] }}">Phone: {{listing['phone'][2:]}}</h5>
     
-                        <h5>Address: {{ listing['location']['display_address']|join(',')}}</h5>
-                        <h5>Rating: {{ listing['rating']}}</h5>
-                        <button id="favor_button">Add to my list</button>
+                        <h5 class="address_{{ listing['id'] }}">Address: {{ listing['location']['display_address']|join(',')}}</h5>
+                        <h5 class="rating_{{ listing['id'] }}">Rating: {{ listing['rating']}}</h5>
+                        <!-- <button class="favor_button" id="{{ listing['id'] }}">Add to my list</button> -->
+                        <form class="yelp_listing_form" action="/add_to_my_list" method="POST">
+                      
+                              <input id="add_name" type="hidden" value="{{ listing['name'] }}" name="add_name">
+                         
+                              <input id="add_phone" type="hidden" value="{{ listing['phone'] }}"  name="add_phone">
+
+                              <input id="add_address" type="hidden" value="{{listing['location']['address1']}} {{listing['location']['address2']}} {{listing['location']['address3']}}" name="add_address">
+                         
+                              <input id="add_city" type="hidden" value="{{ listing['location']['city'] }}" name="add_city">
+                          
+                              <input id="add_state" type="hidden" value="{{ listing['location']['state'] }}"  name="add_state">
+                          
+                              <input id="add_zip_code" type="hidden" value="{{ listing['location']['zip_code'] }}" name="add_zip_code">
+                        
+                              <input id="add_image_url" type="hidden" value="{{ listing['image_url'] }}" name="add_image_url">
+                          
+                              <input id="add_rating" type="hidden" value="{{ listing['rating']}}" step="0.1" name="add_rating">
+
+                              <input id="submitter" type="hidden" value="yelp" name="submitter">
+
+                              <input id="add_yelp_id" type="hidden" value="{{ listing['id'] }}" name="add_yelp_id">
+                  
+
+                              <button type="submit" id="{{ listing['id'] }}">Add to my List</button>
+                          
+                      </form>
                       </div>
                     </div>
                   </div>
                 
                   <div class="row">
                     <div class="col-6">
-                      <img id="listing-img" src="{{ listing['image_url'] }}">
+                      <img class="listing_img" id="{{ listing['id'] }}"" src="{{ listing['image_url'] }}">
                     </div>
                   </div>
 
@@ -70,4 +124,15 @@
     </div>
 
     
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  {% if user_id is not none %}
+    const user_id = {{user_id}}
+    {% else %}
+       const user_id = null
+  {% endif %}
+</script>
+<script src="/static/project.js"></script>
 {% endblock %}

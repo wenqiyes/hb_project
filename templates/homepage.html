@@ -2,10 +2,10 @@
 {% block title %}Apartment Finder Home{% endblock %}
 
 {% block body %}
-    <h1>Welcome to Apartment Finder!</h1>
+    <h1>Welcome to Zipcode Apartment Finder!</h1>
    <form action="/listings" method="'GET">
     <label for="zipcode">Please enter your zip code:</label>
-    <input type="text" name="zipcode" id="zipcode">
+    <input type="text" name="zipcode" id="zipcode" type="text" maxlength="5" onkeyup="value=value.replace(/[^\d]/g,'')" pattern="[0-9]{5}" required>
     <button type="submit">Submit</button>
    </form>
    <a href="{{ url_for('login') }}">Login Page</a><br>

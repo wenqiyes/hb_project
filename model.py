@@ -16,14 +16,11 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String)
 
     def __repr__(self):
-        return f"<User user_id={self.user_id} email={self.email}>"
+        return f"<User user_id={self.id} email={self.email}>"
 
     favorites = db.relationship('Favorite', back_populates = "user")
     listing = db.relationship('Listing', back_populates = "user")
 
-    # def get_id(self):
-    #     print(self.user_id)
-    #     return str(self.user_id)
 
 class Listing(db.Model):
     """An apartment listing that is added or posted by a user"""

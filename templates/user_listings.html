@@ -2,8 +2,25 @@
 {% block title %}User Listings{% endblock %}
 
 {% block body %} 
-    <h1>You are logged in.</h1>
-    <h1>User Listings</h1>
+    <h1>You are logged in. </h1>
+    <h4><a href="{{url_for('logout')}}">Clike here to log out.</a></h4>
+    <h2>User Listings</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <p>
+      <span id="result-count">
+        {{ listing_count }}
+      </span>
+      listings in your account.
+    </p>
+    <button id="add_listing"><a href="/add_listing">Post new listing</a></button>
 
     <ul class="user_listings-list list-group">
         {% for user_listing in user_listings %}
