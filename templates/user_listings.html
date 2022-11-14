@@ -20,7 +20,12 @@
       </span>
       listings in your account.
     </p>
+
+    <div id="favorite_listing" style="border:solid black 1px;"></div>
+
     <button id="add_listing"><a href="/add_listing">Post new listing</a></button>
+
+    
 
     <ul class="user_listings-list list-group">
         {% for user_listing in user_listings %}
@@ -30,10 +35,9 @@
               <div class="col">
                 <div class="d-flex w-100 justify-content-between">
                   <h5>Apartment Name: <a href="" target="_blank">{{ user_listing.name }}</a></h5>
-                  <h5>Phone: {{ user_listing.phone }}</h5>
-
-                  <h5>Address: {{ user_listing.address}}  {{user_listing.zip_code}}</h5>
+                  
                   <h5>Rating: {{ user_listing.rating }}</h5>
+                  <button class="favorite_button" id="{{user_listing.listing_id}}"> Set This My Favorite</button>
                  
                 </div>
               </div>
@@ -47,4 +51,8 @@
           </li>
         {% endfor %}
       </ul>
+{% endblock %}
+
+{% block js %}
+<script src="/static/project.js"></script>
 {% endblock %}

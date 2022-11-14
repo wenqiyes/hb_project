@@ -20,10 +20,8 @@
                   <div class="row">
                     <div class="col">
                       <div class="d-flex w-100 justify-content-between">
-                        <h5>Apartment Name: <a href="" target="_blank">{{ listing.name }}</a></h5>
-                        <h5>Phone: {{listing.phone}}</h5>
-    
-                        <h5>Address: {{ listing.address}} {{listing.zip_code}}</h5>
+                        <h5>Apartment Name: <a href="listings/{{listing.listing_id}}" target="_blank">{{ listing.name }}</a></h5>
+                        
                         <h5>Rating: {{ listing.rating}}</h5>
                         <!-- <button id="{{ listing.listing_id }}">Add to my list</button> -->
                         {% set address_list = listing.address.split(',') %}
@@ -74,10 +72,8 @@
                   <div class="row">
                     <div class="col">
                       <div class="d-flex w-100 justify-content-between">
-                        <h5 class="name_{{ listing['id'] }}">Apartment Name: <a href="" target="_blank">{{ listing['name'] }}</a></h5>
-                        <h5 class="phone_{{ listing['id'] }}">Phone: {{listing['phone'][2:]}}</h5>
-    
-                        <h5 class="address_{{ listing['id'] }}">Address: {{ listing['location']['display_address']|join(',')}}</h5>
+                        <h5 class="name_{{ listing['id'] }}">Apartment Name: <a href="listings/{{listing['id']}}" target="_blank">{{ listing['name'] }}</a></h5>
+                        
                         <h5 class="rating_{{ listing['id'] }}">Rating: {{ listing['rating']}}</h5>
                         <!-- <button class="favor_button" id="{{ listing['id'] }}">Add to my list</button> -->
                         <form class="yelp_listing_form" action="/add_to_my_list" method="POST">

@@ -2,7 +2,7 @@
 
 from pprint import pformat
 
-from flask import Flask, render_template, request, flash, session, redirect,url_for
+from flask import Flask, render_template, request, flash, session, redirect,url_for,jsonify
 from model import connect_to_db, db, User, Listing, Favorite
 import requests
 import json
@@ -101,49 +101,84 @@ def register():
     return render_template('register.html', form=form)
 
 
+API_KEY = os.environ['YELP_KEY']
+
 @app.route("/listings")
 def all_listings():
     """show all the apartment listings"""
-    API_KEY = os.environ['YELP_KEY']
+    
     URL = 'https://api.yelp.com/v3/businesses/search'
-    HEADERS = {'Authorization': 'bearer %s' % API_KEY}
+    HEADERS = {'Authorization': 'bearer %s' % API_KEY}  
 
     # Define the Parameters of the search
-    zip_code = request.args.get('zipcode','')
-    
-    PARAMS = {'location':zip_code,
+    # zip_code = request.args.get('zipcode','')
+
+    if request.args.get('zipcode'):
+        zip_code = request.args.get('zipcode')
+        session['zip_code'] = zip_code
+    elif session.get('zip_code'):
+        zip_code = session['zip_code']
+    else:
+        zip_code = ''
+
+    if zip_code == '':
+        return redirect("/")
+    else:
+        PARAMS = {'location':zip_code,
               'categories':'apartments',
               'limit':50}
    
 
-    # Make a Request to the API, and return results
-    response = requests.get(url=URL, 
+        # Make a Request to the API, and return results
+        response = requests.get(url=URL, 
                             params=PARAMS, 
                             headers=HEADERS)
     
 
-    # Convert response to a JSON String
-    listings_data = response.json()  
+        # Convert response to a JSON String
+        listings_data = response.json()  
 
-    if 'businesses' in listings_data:
-        listing_results = listings_data['businesses']
-    else:
-        listing_results = []
+        if 'businesses' in listings_data:
+            listing_results = listings_data['businesses']
+        else:
+            listing_results = []
     
 
-    #data from database
-    db_results = crud.get_listing_from_db(zip_code)
+        #data from database
+        db_results = crud.get_listing_from_db(zip_code)
     
-    #data count from yelp_api and database
-    data_count = 50 + len(db_results)
+        #data count from yelp_api and database
+        data_count = 50 + len(db_results)
 
-    if 'user_email' in session:
-        user_id = crud.get_user_by_email(session['user_email']).id
+        if 'user_email' in session:
+            user_id = crud.get_user_by_email(session['user_email']).id
+        else:
+            user_id = None
+           
+
+        return render_template('all_listings.html', pformat=pformat,listings_data=listings_data,listing_results=listing_results,db_results=db_results,data_count=data_count, user_id=user_id)
+
+@app.route("/listings/<listing_id>")
+def show_listing_details(listing_id):
+    """Show details on a particular listing."""
+    if listing_id.isdigit()  :
+        db_listing = crud.get_listing_by_id(listing_id)
+        yelp_listing = None
     else:
-        user_id = None
-    print(user_id)
+        db_listing = None
+        URL = f"https://api.yelp.com/v3/businesses/{listing_id}"
+        HEADERS = {'Authorization': 'bearer %s' % API_KEY}  
+   
 
-    return render_template('all_listings.html', pformat=pformat,listings_data=listings_data,listing_results=listing_results,db_results=db_results,data_count=data_count, user_id=user_id)
+        # Make a Request to the API, and return results
+        response = requests.get(url=URL, 
+                            headers=HEADERS)
+    
+
+        # Convert response to a JSON String
+        yelp_listing = response.json()  
+
+    return render_template("listing_details.html", db_listing=db_listing,yelp_listing = yelp_listing)
 
 @app.route("/add_listing")
 @login_required
@@ -225,6 +260,7 @@ def post_new_listing():
         
 
 @app.route("/user_listings") 
+@login_required
 def show_user_listing() :
     """show all user listings"""
     user_email = session.get("user_email","")
@@ -240,6 +276,23 @@ def show_user_listing() :
         # return render_template('user_listings.html',user_listings=user_listings)
     finally:
         return render_template('user_listings.html',user_listings=user_listings,listing_count=listing_count)
+
+@app.route("/user_listings/favorite.json", methods=['POST'])
+@login_required
+def set_favorite():
+    """set listing as favorite listing"""
+    listing_id = int(request.json.get('listing_id'))
+    print(listing_id)
+    listing = crud.get_listing_by_id(listing_id)
+    print(listing)
+
+    if listing:
+        result_text = f"{listing.name} is your favorite listing!"
+    else:
+        result_text = "There is no favorite listing yet."
+
+    return jsonify({'msg': result_text})
+
 
 
 

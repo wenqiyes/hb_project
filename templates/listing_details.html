@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {% if db_listing is not none %}
+    {{ db_listing.name }} - Details
+  {% else %}
+    {{ yelp_listing['name'] }} - Details
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+<h1>
+    {% if db_listing is not none %}
+      {{ db_listing.name }}
+    {% else %}
+      {{ yelp_listing['name'] }} 
+    {% endif %}
+</h1>
+
+
+<p><b>Phone:</b>
+  {% if db_listing is not none %}
+      {{ db_listing.phone }}
+    {% else %}
+      {{ yelp_listing['phone'][2:] }} 
+    {% endif %}
+</p>
+
+<p><b>Address:</b>
+  {% if db_listing is not none %}
+      {{ db_listing.address }}
+    {% else %}
+      {{ yelp_listing['location']['display_address']|join(',') }} 
+    {% endif %}
+</p>
+
+<p><b>Rating:</b>
+  {% if db_listing is not none %}
+      {{ db_listing.rating }}
+    {% else %}
+      {{ yelp_listing['rating'] }} 
+    {% endif %}
+</p>
+
+{% if db_listing is not none %}
+    <img src="{{ db_listing.image_url }}">
+{% else %}
+    <img src="{{ yelp_listing['image_url'] }}">
+{% endif %}
+
+{% endblock %}
