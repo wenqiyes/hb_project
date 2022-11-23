@@ -43,9 +43,95 @@
 </p>
 
 {% if db_listing is not none %}
-    <img src="{{ db_listing.image_url }}">
+    <img class="listing-detail-photo" src="{{ db_listing.image_url }}">
 {% else %}
-    <img src="{{ yelp_listing['image_url'] }}">
+    <div class="row">
+      {% for photo in yelp_listing['photos'] %}
+        <div class="col-md-4">
+          <img class="listing_img" src="{{ photo }}">
+        </div>
+      {% endfor %}
+    </div>
 {% endif %}
+
+<!-- Data for Grocery stores-->
+<div class="container">
+  <h3>Nearby Grocery Stores:</h3>
+  <div class="row">
+    {% for grocery in grocery_results %}
+      <div class="col-md-3">
+        <div class="card" style="width: auto;">
+          <img class="card-img-top" src="{{grocery['image_url']}}" alt="grocery stores" style="height:20rem;">
+          <div class="card-body" style="height:auto;">
+            <h5 class="card-title">{{ grocery['name'] }}</h5>
+            <p class="card-text">{{ grocery['location']['display_address']|join(',') }}</p>
+            <a href="{{ grocery['url'] }}" class="btn btn-primary">MORE DETAILS</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Data for Restaurants-->
+<div class="container">
+  <h3>Nearby Restaurants:</h3>
+  <div class="row">
+    {% for restaurant in restaurant_results %}
+      <div class="col-md-3">
+        <div class="card" style="width: auto;">
+          <img class="card-img-top" src="{{ restaurant['image_url'] }}" alt="grocery stores" style="height:20rem;">
+          <div class="card-body" style="height:auto;">
+            <h5 class="card-title">{{ restaurant['name'] }}</h5>
+            <p class="card-text">{{ restaurant['location']['display_address']|join(',') }}</p>
+            <a href="{{ restaurant['url'] }}" class="btn btn-primary">MORE DETAILS</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!--Data for gyms-->
+<div class="container">
+  <h3>Nearby Gyms:</h3>
+  <div class="row">
+    {% for gym in gym_results %}
+      <div class="col-md-3">
+        <div class="card" style="width: auto;">
+          <img class="card-img-top" src="{{gym['image_url']}}" alt="gyms" style="height:20rem;">
+          <div class="card-body" style="height:auto;">
+            <h5 class="card-title">{{ gym['name'] }}</h5>
+            <p class="card-text">{{ gym['location']['display_address']|join(',') }}</p>
+            <a href="{{ gym['url'] }}" class="btn btn-primary">MORE DETAILS</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!--Data for gas stations-->
+<div class="container">
+  <h3>Nearby Gas Stations:</h3>
+  <div class="row">
+    {% for gas in gas_results %}
+      <div class="col-md-3">
+        <div class="card" style="width: auto;">
+          <img class="card-img-top" src="{{gas['image_url']}}" alt="gas station" style="height:20rem;">
+          <div class="card-body" style="height:auto;">
+            <h5 class="card-title">{{ gas['name'] }}</h5>
+            <p class="card-text">{{ gas['location']['display_address']|join(',') }}</p>
+            <a href="{{ gas['url'] }}" class="btn btn-primary">MORE DETAILS</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+
 
 {% endblock %}

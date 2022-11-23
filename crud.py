@@ -51,7 +51,7 @@ def get_listing_by_user_email(user_email):
 
 def get_listing_from_db(zip_code):
     """Get listings that is posted by the user"""
-    return Listing.query.filter(Listing.zip_code == zip_code, Listing.yelp_id =='').all()
+    return Listing.query.filter(Listing.zip_code == zip_code, Listing.yelp_id =='').order_by(Listing.listing_id.desc()).all()
 
 def create_favorite(user, listing):
     """Create and return a new movie."""

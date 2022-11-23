@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Login{% endblock %}
 {% block body %}
-    <h1>Login Page</h1>
-    {% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages() %}
       {% if messages %}
         <ul class=flashes>
           {% for message in messages %}
@@ -10,7 +9,9 @@
           {% endfor %}
         </ul>
       {% endif %}
-    {% endwith %}
+  {% endwith %}
+
+    <h1>Login Page</h1>
 
     <form method="POST" action="">
         {{ form.hidden_tag() }}

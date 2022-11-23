@@ -3,12 +3,11 @@
 from pprint import pformat
 
 from flask import Flask, render_template, request, flash, session, redirect,url_for,jsonify
-from model import connect_to_db, db, User, Listing, Favorite
+from model import connect_to_db, db, User
 import requests
-import json
 import os
 import crud
-from flask_login import login_user, LoginManager, login_required, logout_user, current_user
+from flask_login import login_user, LoginManager, login_required, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
@@ -103,6 +102,7 @@ def register():
 
 API_KEY = os.environ['YELP_KEY']
 
+
 @app.route("/listings")
 def all_listings():
     """show all the apartment listings"""
@@ -114,14 +114,37 @@ def all_listings():
     # zip_code = request.args.get('zipcode','')
 
     if request.args.get('zipcode'):
-        zip_code = request.args.get('zipcode')
-        session['zip_code'] = zip_code
+        if request.args.get('zipcode').isdigit():
+            zip_code = request.args.get('zipcode')
+            session['zip_code'] = zip_code
+        else:
+            name = request.args.get('zipcode')
+            PARAMS = {'location':name,
+              'categories':'apartments',
+              'limit':50}
+   
+            # Make a Request to the API, and return results
+            response = requests.get(url=URL, 
+                            params=PARAMS, 
+                            headers=HEADERS)
+    
+             # Convert response to a JSON String
+            listings_data = response.json()  
+
+            if 'businesses' in listings_data:
+                zip_code = listings_data['businesses'][0]['location']['zip_code']
+                session['zip_code'] = zip_code
+            else:
+                zip_code = ''
+            
+
     elif session.get('zip_code'):
         zip_code = session['zip_code']
     else:
         zip_code = ''
 
     if zip_code == '':
+        flash("Please enter valid input! ")
         return redirect("/")
     else:
         PARAMS = {'location':zip_code,
@@ -154,31 +177,110 @@ def all_listings():
             user_id = crud.get_user_by_email(session['user_email']).id
         else:
             user_id = None
-           
 
-        return render_template('all_listings.html', pformat=pformat,listings_data=listings_data,listing_results=listing_results,db_results=db_results,data_count=data_count, user_id=user_id)
+        #combining data from yelp api and database
+        db_results.extend(listing_results)
+        merged_list = db_results
+
+        paginated = [] #list of lists 
+        #loop over -every 10, break and do the same thing again
+        for i in range(len(merged_list)):
+            if i % 10 == 0:
+                #create a new list 
+                paginated.append([])
+             #append item from the merged list to last list of list
+            paginated[-1].append(merged_list[i])    
+            
+
+        return render_template('all_listings.html', pformat=pformat,listing_results=listing_results,data_count=data_count, user_id=user_id, paginated=paginated)
 
 @app.route("/listings/<listing_id>")
 def show_listing_details(listing_id):
     """Show details on a particular listing."""
+    URL = 'https://api.yelp.com/v3/businesses/search'
+    HEADERS = {'Authorization': 'bearer %s' % API_KEY}  
+
+    # check whther the listing source comes from the database or yelp api
     if listing_id.isdigit()  :
         db_listing = crud.get_listing_by_id(listing_id)
+        zip_code = db_listing.zip_code
         yelp_listing = None
     else:
         db_listing = None
-        URL = f"https://api.yelp.com/v3/businesses/{listing_id}"
-        HEADERS = {'Authorization': 'bearer %s' % API_KEY}  
-   
+        ID_URL = f"https://api.yelp.com/v3/businesses/{listing_id}"
 
         # Make a Request to the API, and return results
-        response = requests.get(url=URL, 
+        response = requests.get(url=ID_URL, 
                             headers=HEADERS)
     
 
         # Convert response to a JSON String
-        yelp_listing = response.json()  
+        yelp_listing = response.json()
+        zip_code = yelp_listing['location']['zip_code'] 
 
-    return render_template("listing_details.html", db_listing=db_listing,yelp_listing = yelp_listing)
+    #get data for nearby restaurants
+    RESTAURANTPARAMS = {'location':zip_code,
+              'categories':'restaurants',
+              'limit':4}
+     # Make a Request to the API, and return results
+    restaurant_response = requests.get(url=URL, 
+                            params=RESTAURANTPARAMS, 
+                            headers=HEADERS,
+                            )
+    
+
+    # Convert response to a JSON String
+    restaurant_data = restaurant_response.json()
+    restaurant_results = restaurant_data['businesses']
+
+
+    #get data for nearby gas stations
+    GASPARAMS = {'location':zip_code,
+              'categories':'servicestations',
+              'limit':4}
+     # Make a Request to the API, and return results
+    gas_response = requests.get(url=URL, 
+                            params=GASPARAMS, 
+                            headers=HEADERS,
+                            )
+    
+
+    # Convert response to a JSON String
+    gas_data = gas_response.json()
+    gas_results = gas_data['businesses']
+
+
+    #get data for nearby gyms
+    GYMPARAMS = {'location':zip_code,
+              'categories':'gyms',
+              'limit':4}
+     # Make a Request to the API, and return results
+    gym_response = requests.get(url=URL, 
+                            params=GYMPARAMS, 
+                            headers=HEADERS,
+                            )
+    
+
+    # Convert response to a JSON String
+    gym_data = gym_response.json()
+    gym_results = gym_data['businesses']
+
+    #get data for nearby grocery
+    GROCERYPARAMS = {'location':zip_code,
+              'categories':'grocery',
+              'limit':4}
+     # Make a Request to the API, and return results
+    grocery_response = requests.get(url=URL, 
+                            params=GROCERYPARAMS, 
+                            headers=HEADERS,
+                            )
+    
+
+    # Convert response to a JSON String
+    grocery_data = grocery_response.json()
+    grocery_results = grocery_data['businesses']
+
+    return render_template("listing_details.html", db_listing=db_listing,yelp_listing = yelp_listing,gas_results=gas_results,gym_results = gym_results,grocery_results=grocery_results,restaurant_results=restaurant_results)
 
 @app.route("/add_listing")
 @login_required
@@ -222,6 +324,7 @@ def add_to_my_list():
         return render_template('user_listings.html',user_listings=user_listings,listing_count=listing_count)
     else:
         return redirect("/")
+    
 
 
 @app.route("/post_listing",  methods=['POST'])
@@ -277,14 +380,16 @@ def show_user_listing() :
     finally:
         return render_template('user_listings.html',user_listings=user_listings,listing_count=listing_count)
 
+
+
 @app.route("/user_listings/favorite.json", methods=['POST'])
 @login_required
 def set_favorite():
     """set listing as favorite listing"""
     listing_id = int(request.json.get('listing_id'))
-    print(listing_id)
+    
     listing = crud.get_listing_by_id(listing_id)
-    print(listing)
+
 
     if listing:
         result_text = f"{listing.name} is your favorite listing!"
@@ -294,7 +399,22 @@ def set_favorite():
     return jsonify({'msg': result_text})
 
 
+@app.route("/user_listings/delete", methods=['POST'])
+@login_required
+def delete_listing():
+    """delete listing from user's database"""
+    listing_id = int(request.json.get('listing_id'))
+    
+    listing = crud.get_listing_by_id(listing_id)
 
+
+    if listing:
+        db.session.delete(listing)
+        db.session.commit()
+
+    return redirect("/user_listings")
+    
+        
 
 
 if __name__ == "__main__":

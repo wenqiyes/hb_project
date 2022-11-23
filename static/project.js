@@ -1,4 +1,4 @@
-// dbListingButtons = document.querySelectorAll('.db_listing_button')
+// handle adding listing to user's database
 const dbListingForm = document.querySelectorAll('.db_listing_form')
 const yelpListingForm = document.querySelectorAll('.yelp_listing_form')
 
@@ -27,11 +27,13 @@ for (const form of yelpListingForm) {
             
         })}
 
+
+// set certain listing in user's database as one of the favorite listings
 favoriteButtons = document.querySelectorAll('.favorite_button');
 
 for (const button of favoriteButtons) {
     button.addEventListener('click', (evt) => {
-        evt.preventDefault();
+        // evt.preventDefault();
         const formInputs = {
         listing_id : button.id
         }
@@ -50,3 +52,31 @@ for (const button of favoriteButtons) {
             })
     })
 }
+
+// add deleting feature to user's listing page 
+deleteButtons = document.querySelectorAll('.delete_listing_button');
+
+for (const button of deleteButtons) {
+    button.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        const formInputs = {
+        listing_id : button.id
+        }
+        const url = '/user_listings/delete'
+        const params = {
+            method:'POST',
+            body: JSON.stringify(formInputs),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        fetch(url,params)
+            .then ((response) => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            
+    })
+}
+

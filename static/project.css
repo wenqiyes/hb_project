@@ -3,6 +3,12 @@
     height: 100%;
 }
 
+.listing-detail-photo{
+    width: 40%;
+    height: 30%;
+}
+
 #favorite_listing{
     margin:10px;
 }
+
