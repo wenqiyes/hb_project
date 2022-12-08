@@ -79,11 +79,11 @@ def login():
 
 
 @app.route('/logout', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def logout():
     logout_user()
     session.pop('user_email')
-    return redirect("/")
+    return redirect("/login")
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -93,9 +93,13 @@ def register():
     if form.validate_on_submit():
         hashed_password = werkzeug.security.generate_password_hash(form.password.data)
         new_user = User(email=form.email.data, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
+        user = User.query.filter_by( email=form.email.data).first()
+        if user:
+            flash("This login email already exists. please try again!")
+        else:
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
 

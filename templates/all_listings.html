@@ -2,10 +2,11 @@
 {% block title %}All Listings{% endblock %}
 
 {% block body %}
-    <div class="container">
-        
-        <div id="listing-search-results">
-            <h2 id="top">Search Results</h2>
+    
+
+        <div id="all-listings-banner">
+          <div class="all-listings-text">
+          <h2 id="top">Search Results</h2>
     
             <p>
               <span id="result-count">
@@ -13,6 +14,10 @@
               </span>
               listings matched your search for {{ listing_results[0]['location']['city'] }}, {{ listing_results[0]['location']['state'] }}.
             </p>
+          </div>
+        </div>  
+    <div class="all-listings-container">
+        <div id="listing-search-results">
             {% for i in range(paginated|length) %}
               {% if i == 0 %}
               <div class="page" id="page{{ i }}" style="display:block">
@@ -25,10 +30,10 @@
                     <ul class="yelp-listing-list list-group">
                       <li class="list-group-item list-group-item-action">
         
-                        <div class="row">
+                        <div class="row listing-title">
                           <div class="col">
                             <div class="d-flex w-100 justify-content-between">
-                              <h5 class="name_{{ listing['id'] }}">Apartment Name: <a href="listings/{{listing['id']}}" target="_blank">{{ listing['name'] }}</a></h5>
+                              <h5 class="name_{{ listing['id'] }}"><span class="apartment-name">Apartment Name: </span><a href="listings/{{listing['id']}}" target="_blank">{{ listing['name'] }}</a></h5>
                               
                               <h5 class="rating_{{ listing['id'] }}">Rating: {{ listing['rating']}}</h5>
                               <!-- <button class="favor_button" id="{{ listing['id'] }}">Add to my list</button> -->
@@ -55,7 +60,7 @@
                                     <input id="add_yelp_id" type="hidden" value="{{ listing['id'] }}" name="add_yelp_id">
                         
                 
-                                    <button type="submit" id="{{ listing['id'] }}">Add to my List</button>
+                                    <button class="all-listings-buttons" type="submit" id="{{ listing['id'] }}">Add to my List</button>
                                 
                             </form>
                             </div>
@@ -74,10 +79,10 @@
                   <ul class="db-listing-list list-group">
                     <li class="list-group-item list-group-item-action">
         
-                      <div class="row">
+                      <div class="row listing-title">
                         <div class="col">
                           <div class="d-flex w-100 justify-content-between">
-                            <h5>Apartment Name: <a href="listings/{{listing.listing_id}}" target="_blank">{{ listing.name }}</a></h5>
+                            <h5><span class="apartment-name">Apartment Name: </span><a href="listings/{{listing.listing_id}}" target="_blank">{{ listing.name }}</a></h5>
                             
                             <h5>Rating: {{ listing.rating}}</h5>
                             <!-- <button id="{{ listing.listing_id }}">Add to my list</button> -->
@@ -131,6 +136,7 @@
             <a href="#top">To the top</a>
         
         </div>
+    </div>
     </div>
 
     

@@ -1,8 +1,60 @@
+/* All listings page*/
 .listing_img{
     width: 100%;
     height: 100%;
 }
 
+#all-listings-banner{
+    background:url("../static/images/all-listings-banner.jpg") no-repeat center;
+    height: 250px;
+    text-align: center;
+    background-size: cover;
+    filter: grayscale(0.30);
+    color: white;
+    padding-top: 75px;
+}
+
+.all-listings-text{
+    background: rgba(150, 75, 0,0.5);
+    height: 90px;
+    padding-top: 10px;
+    
+}
+
+.all-listings-container{
+    margin: 0 55px 0 40px;;
+    
+}
+
+.list-group-item{
+    margin:8px;
+}
+
+.listing-title{
+    margin: 5px 0;
+}
+
+.apartment-name{
+    color: black;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.list-group-item:hover{
+    background-color: Ivory;
+    border: solid 2px black;
+}
+
+.page-button{
+    margin: 10px 0;
+}
+
+.all-listings-buttons:hover{
+    background-color: rgba(150, 75, 0,0.5);
+    font-weight: bolder;
+}
+
+/* Listing detail page*/
 .listing-detail-photo{
     width: 40%;
     height: 30%;
@@ -12,3 +64,48 @@
     margin:10px;
 }
 
+/* Homepage */
+#homepage-body{
+    height: 100%;
+    background: url("../static/images/background.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+#home-content{
+    padding:300px 0;
+    text-align: center;
+    display: block;   
+}
+
+.home-text{
+    color: white;
+    margin: auto;
+    padding-top: 75px;
+    /* background-color: grey ; */
+    background: rgba( 128, 128, 128, 0.75 );
+    /* opacity: 0.75; */
+    width: 55%;
+    height: 250px;
+}
+
+
+.form-control{
+    margin: auto;
+    width:75%;
+}
+
+@media screen and (max-width:850px){
+    .home-text{
+        height: 300px;
+    }
+}
+
+/*Login page*/
+#form-button{
+    padding-left: 65px;
+}
+
+#login-box{
+    margin: auto;
+    margin-top: 50px;
+}
