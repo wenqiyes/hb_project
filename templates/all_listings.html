@@ -16,7 +16,7 @@
             </p>
           </div>
         </div>  
-    <div class="all-listings-container">
+    <div class="container all-listings">
         <div id="listing-search-results">
             {% for i in range(paginated|length) %}
               {% if i == 0 %}
@@ -69,7 +69,7 @@
                       
                         <div class="row">
                           <div class="col-6">
-                            <img class="listing_img" id="{{ listing['id'] }}"" src="{{ listing['image_url'] }}">
+                            <a href="listings/{{listing['id']}}" target="_blank"><img class="listing_img" id="{{ listing['id'] }}"" src="{{ listing['image_url'] }}"></a>
                           </div>
                         </div>
                 
@@ -119,7 +119,7 @@
                     
                       <div class="row">
                         <div class="col-6">
-                          <img class="listing_img" id="{{ listing.listing_id }}" src="{{ listing.image_url}}">
+                          <a href="listings/{{listing.listing_id}}" target="_blank"><img class="listing_img" id="{{ listing.listing_id }}" src="{{ listing.image_url}}"></a>
                         </div>
                       </div>
               
